@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.objectIdWithTimestamp = exports.getTempValue = exports.setTempValue = exports.dbCreateIndex = exports.connectDb = exports.getAllCollectionNames = exports.insertManyIgnoreDup = void 0;
+exports.objectIdWithTimestamp = exports.getTempValue = exports.setTempValue = exports.getCollectionNames = exports.getAllCollectionNames = exports.dbCreateIndex = exports.connectDb = exports.insertManyIgnoreDup = void 0;
 const mongodb = __importStar(require("mongodb"));
 function insertManyIgnoreDup(collection, data) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -65,19 +65,6 @@ function insertManyIgnoreDup(collection, data) {
     });
 }
 exports.insertManyIgnoreDup = insertManyIgnoreDup;
-function getAllCollectionNames(db) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const collections = yield db.listCollections().toArray();
-        const ret = [];
-        for (let collection of collections) {
-            if (collection && collection.type === 'collection') {
-                ret.push(collection.name);
-            }
-        }
-        return ret;
-    });
-}
-exports.getAllCollectionNames = getAllCollectionNames;
 function connectDb(mongoUrlOverride, options) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!mongoUrlOverride) {
@@ -93,25 +80,22 @@ function dbCreateIndex(collection, indexConfig, indexOptions) {
     });
 }
 exports.dbCreateIndex = dbCreateIndex;
+// getAllCollectionNames with views
+function getAllCollectionNames(db) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const collections = yield db.listCollections({}, { nameOnly: true }).toArray();
+        return collections.map(c => c.name);
+    });
+}
+exports.getAllCollectionNames = getAllCollectionNames;
 // getCollectionNames exclude views
-// export async function getCollectionNames(db: mongodb.Db) {
-//   const collections = await db.listCollections();
-//   const collectionNames = (() => {
-//     const _collectionNames: string[] = [];
-//     collections.each((_err: any, collection: any) => {
-//       if (
-//         collection &&
-//         !collection.options.viewOn &&
-//         collection.name !== "system.views"
-//       ) {
-//         _collectionNames.push(collection.name);
-//       } else if (!collection) {
-//         return _collectionNames;
-//       }
-//     });
-//   })();
-//   return collectionNames;
-// }
+function getCollectionNames(db) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const collections = yield db.listCollections({}, { nameOnly: false }).toArray();
+        return collections.filter(c => c.type === 'collection').map(c => c.name);
+    });
+}
+exports.getCollectionNames = getCollectionNames;
 function setTempValue(db, key, doc) {
     return __awaiter(this, void 0, void 0, function* () {
         // store a value to temp db
@@ -123,7 +107,7 @@ function setTempValue(db, key, doc) {
     });
 }
 exports.setTempValue = setTempValue;
-function getTempValue(db, key, doc) {
+function getTempValue(db, key) {
     return __awaiter(this, void 0, void 0, function* () {
         // store a value to temp db
         return yield db.collection('temp').findOne({

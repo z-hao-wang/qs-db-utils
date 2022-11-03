@@ -26,17 +26,6 @@ export async function insertManyIgnoreDup(collection: mongodb.Collection, data: 
   return { inserted: data.length - skipped, skipped };
 }
 
-export async function getAllCollectionNames(db: mongodb.Db): Promise<string[]> {
-  const collections = await db.listCollections().toArray();
-  const ret: string[] = [];
-  for (let collection of collections) {
-    if (collection && collection.type === 'collection') {
-      ret.push(collection.name);
-    }
-  }
-  return ret;
-}
-
 export async function connectDb(
   mongoUrlOverride: string,
   options: mongodb.MongoClientOptions,
@@ -50,31 +39,23 @@ export async function connectDb(
 
 export async function dbCreateIndex(
   collection: mongodb.Collection,
-  indexConfig: any,
+  indexConfig: Record<string, any>,
   indexOptions: mongodb.CreateIndexesOptions,
 ) {
   return await collection.createIndex(indexConfig, indexOptions);
 }
 
+// getAllCollectionNames with views
+export async function getAllCollectionNames(db: mongodb.Db): Promise<string[]> {
+  const collections = await db.listCollections({}, { nameOnly: true }).toArray();
+  return collections.map((c) => c.name);
+}
+
 // getCollectionNames exclude views
-// export async function getCollectionNames(db: mongodb.Db) {
-//   const collections = await db.listCollections();
-//   const collectionNames = (() => {
-//     const _collectionNames: string[] = [];
-//     collections.each((_err: any, collection: any) => {
-//       if (
-//         collection &&
-//         !collection.options.viewOn &&
-//         collection.name !== "system.views"
-//       ) {
-//         _collectionNames.push(collection.name);
-//       } else if (!collection) {
-//         return _collectionNames;
-//       }
-//     });
-//   })();
-//   return collectionNames;
-// }
+export async function getCollectionNames(db: mongodb.Db) {
+  const collections = await db.listCollections({}, { nameOnly: false }).toArray();
+  return collections.filter((c) => c.type === 'collection').map((c) => c.name);
+}
 
 export async function setTempValue(db: mongodb.Db, key: string, doc: { [key: string]: any }) {
   // store a value to temp db
@@ -92,7 +73,7 @@ export async function setTempValue(db: mongodb.Db, key: string, doc: { [key: str
   );
 }
 
-export async function getTempValue(db: mongodb.Db, key: string, doc: { [key: string]: any }) {
+export async function getTempValue(db: mongodb.Db, key: string) {
   // store a value to temp db
   return await db.collection('temp').findOne({
     key,
