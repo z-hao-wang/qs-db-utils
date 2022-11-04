@@ -3,7 +3,7 @@ export declare function insertManyIgnoreDup(collection: mongodb.Collection, data
     inserted: number;
     skipped: number;
 }>;
-export declare function connectDb(mongoUrlOverride: string, options: mongodb.MongoClientOptions): Promise<mongodb.MongoClient>;
+export declare function connectDb(mongoUrl: string, options?: mongodb.MongoClientOptions): Promise<mongodb.MongoClient>;
 export declare function dbCreateIndex(collection: mongodb.Collection, indexConfig: Record<string, any>, indexOptions: mongodb.CreateIndexesOptions): Promise<string>;
 export declare function getAllCollectionNames(db: mongodb.Db): Promise<string[]>;
 export declare function getCollectionNames(db: mongodb.Db): Promise<string[]>;

@@ -27,14 +27,14 @@ export async function insertManyIgnoreDup(collection: mongodb.Collection, data: 
 }
 
 export async function connectDb(
-  mongoUrlOverride: string,
-  options: mongodb.MongoClientOptions,
+  mongoUrl: string,
+  options: mongodb.MongoClientOptions = {},
 ): Promise<mongodb.MongoClient> {
-  if (!mongoUrlOverride) {
+  if (!mongoUrl) {
     throw Error('invalid mongoddb url');
   }
 
-  return await mongodb.MongoClient.connect(mongoUrlOverride, options);
+  return await mongodb.MongoClient.connect(mongoUrl, options);
 }
 
 export async function dbCreateIndex(

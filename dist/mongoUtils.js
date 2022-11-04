@@ -65,12 +65,12 @@ function insertManyIgnoreDup(collection, data) {
     });
 }
 exports.insertManyIgnoreDup = insertManyIgnoreDup;
-function connectDb(mongoUrlOverride, options) {
+function connectDb(mongoUrl, options = {}) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!mongoUrlOverride) {
+        if (!mongoUrl) {
             throw Error('invalid mongoddb url');
         }
-        return yield mongodb.MongoClient.connect(mongoUrlOverride, options);
+        return yield mongodb.MongoClient.connect(mongoUrl, options);
     });
 }
 exports.connectDb = connectDb;
@@ -84,7 +84,7 @@ exports.dbCreateIndex = dbCreateIndex;
 function getAllCollectionNames(db) {
     return __awaiter(this, void 0, void 0, function* () {
         const collections = yield db.listCollections({}, { nameOnly: true }).toArray();
-        return collections.map(c => c.name);
+        return collections.map((c) => c.name);
     });
 }
 exports.getAllCollectionNames = getAllCollectionNames;
@@ -92,7 +92,7 @@ exports.getAllCollectionNames = getAllCollectionNames;
 function getCollectionNames(db) {
     return __awaiter(this, void 0, void 0, function* () {
         const collections = yield db.listCollections({}, { nameOnly: false }).toArray();
-        return collections.filter(c => c.type === 'collection').map(c => c.name);
+        return collections.filter((c) => c.type === 'collection').map((c) => c.name);
     });
 }
 exports.getCollectionNames = getCollectionNames;
