@@ -30,7 +30,14 @@ function moveBatch(fromDb, toDb, criteria, onBatchComplete, batchSize = 1000) {
 exports.moveBatch = moveBatch;
 function rebuildCollectionData(db, collectionName) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield db.collection(collectionName).rename(collectionName + '_tmp');
+        const existingTmp = yield db.listCollections({ name: collectionName + '_tmp' }).toArray();
+        if (existingTmp && existingTmp.length > 0) {
+            console.log(`tmp collection exists for ${collectionName}_tmp, continue to move`);
+        }
+        else {
+            console.log(`rename ${collectionName} to ${collectionName}_tmp`);
+            yield db.collection(collectionName).rename(collectionName + '_tmp');
+        }
         yield (0, indexingUtils_1.syncIndex)(db.collection(collectionName + '_tmp'), db.collection(collectionName));
         yield moveBatch(db.collection(collectionName + '_tmp'), db.collection(collectionName), {}, (result) => {
             console.log(`${db.databaseName} ${collectionName} inserted ${result.inserted} skipped ${result.skipped}`);

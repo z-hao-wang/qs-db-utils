@@ -23,7 +23,14 @@ export async function moveBatch(
 }
 
 export async function rebuildCollectionData(db: mongodb.Db, collectionName: string) {
-  await db.collection(collectionName).rename(collectionName + '_tmp');
+  const existingTmp = await db.listCollections({ name: collectionName + '_tmp' }).toArray();
+  if (existingTmp && existingTmp.length > 0) {
+    console.log(`tmp collection exists for ${collectionName}_tmp, continue to move`);
+  } else {
+    console.log(`rename ${collectionName} to ${collectionName}_tmp`);
+    await db.collection(collectionName).rename(collectionName + '_tmp');
+  }
+
   await syncIndex(db.collection(collectionName + '_tmp'), db.collection(collectionName));
 
   await moveBatch(db.collection(collectionName + '_tmp'), db.collection(collectionName), {}, (result) => {
