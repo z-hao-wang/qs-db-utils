@@ -30,26 +30,30 @@ function moveBatch(fromDb, toDb, criteria, onBatchComplete, batchSize = 1000) {
 exports.moveBatch = moveBatch;
 function rebuildCollectionData(db, collectionName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const existingTmp = yield db.listCollections({ name: collectionName + '_tmp' }).toArray();
+        const tmpCollectionName = collectionName + '_tmp';
+        const existingTmp = yield db.listCollections({ name: tmpCollectionName }).toArray();
         if (existingTmp && existingTmp.length > 0) {
-            console.log(`tmp collection exists for ${collectionName}_tmp, continue to move`);
+            console.log(`tmp collection exists for ${tmpCollectionName}, continue to move`);
         }
         else {
-            console.log(`rename ${collectionName} to ${collectionName}_tmp`);
-            yield db.collection(collectionName).rename(collectionName + '_tmp');
+            console.log(`rename ${collectionName} to ${tmpCollectionName}`);
+            yield db.collection(collectionName).rename(tmpCollectionName);
         }
-        yield (0, indexingUtils_1.syncIndex)(db.collection(collectionName + '_tmp'), db.collection(collectionName));
-        yield moveBatch(db.collection(collectionName + '_tmp'), db.collection(collectionName), {}, (result) => {
+        yield (0, indexingUtils_1.syncIndex)(db.collection(tmpCollectionName), db.collection(collectionName));
+        yield moveBatch(db.collection(tmpCollectionName), db.collection(collectionName), {}, (result) => {
             console.log(`${db.databaseName} ${collectionName} inserted ${result.inserted} skipped ${result.skipped}`);
         });
         // expect tmp collection has 0 value
         const count = yield db
-            .collection(collectionName + '_tmp')
+            .collection(tmpCollectionName)
             .find({})
             .count();
-        const countNew = yield db.collection(collectionName).find({}).count();
         if (count !== 0) {
-            throw new Error(`move Batch failed, data length ${count} is not 0 countNew=${countNew}`);
+            throw new Error(`move Batch failed, data length ${count} is not 0`);
+        }
+        else {
+            console.log(`done, dropping collection ${tmpCollectionName}`);
+            yield db.dropCollection(tmpCollectionName);
         }
     });
 }

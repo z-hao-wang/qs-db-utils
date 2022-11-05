@@ -23,27 +23,27 @@ export async function moveBatch(
 }
 
 export async function rebuildCollectionData(db: mongodb.Db, collectionName: string) {
-  const existingTmp = await db.listCollections({ name: collectionName + '_tmp' }).toArray();
+  const tmpCollectionName = collectionName + '_tmp';
+  const existingTmp = await db.listCollections({ name: tmpCollectionName }).toArray();
   if (existingTmp && existingTmp.length > 0) {
-    console.log(`tmp collection exists for ${collectionName}_tmp, continue to move`);
+    console.log(`tmp collection exists for ${tmpCollectionName}, continue to move`);
   } else {
-    console.log(`rename ${collectionName} to ${collectionName}_tmp`);
-    await db.collection(collectionName).rename(collectionName + '_tmp');
+    console.log(`rename ${collectionName} to ${tmpCollectionName}`);
+    await db.collection(collectionName).rename(tmpCollectionName);
   }
 
-  await syncIndex(db.collection(collectionName + '_tmp'), db.collection(collectionName));
+  await syncIndex(db.collection(tmpCollectionName), db.collection(collectionName));
 
-  await moveBatch(db.collection(collectionName + '_tmp'), db.collection(collectionName), {}, (result) => {
+  await moveBatch(db.collection(tmpCollectionName), db.collection(collectionName), {}, (result) => {
     console.log(`${db.databaseName} ${collectionName} inserted ${result.inserted} skipped ${result.skipped}`);
   });
   // expect tmp collection has 0 value
-  const count = await db
-    .collection(collectionName + '_tmp')
-    .find({})
-    .count();
-  const countNew = await db.collection(collectionName).find({}).count();
+  const count = await db.collection(tmpCollectionName).find({}).count();
   if (count !== 0) {
-    throw new Error(`move Batch failed, data length ${count} is not 0 countNew=${countNew}`);
+    throw new Error(`move Batch failed, data length ${count} is not 0`);
+  } else {
+    console.log(`done, dropping collection ${tmpCollectionName}`);
+    await db.dropCollection(tmpCollectionName);
   }
 }
 
