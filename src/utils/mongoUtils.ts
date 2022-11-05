@@ -37,14 +37,6 @@ export async function connectDb(
   return await mongodb.MongoClient.connect(mongoUrl, options);
 }
 
-export async function dbCreateIndex(
-  collection: mongodb.Collection,
-  indexConfig: Record<string, any>,
-  indexOptions: mongodb.CreateIndexesOptions,
-) {
-  return await collection.createIndex(indexConfig, indexOptions);
-}
-
 // getAllCollectionNames with views
 export async function getAllCollectionNames(db: mongodb.Db): Promise<string[]> {
   const collections = await db.listCollections({}, { nameOnly: true }).toArray();
@@ -88,4 +80,10 @@ export function objectIdWithTimestamp(timestamp: number) {
   const constructedObjectId = new mongodb.ObjectId(hexSeconds + '0000000000000000');
 
   return constructedObjectId;
+}
+
+export async function getAllDatabases(con: mongodb.MongoClient) {
+  const adminDb = con.db('admin');
+  // List all the available databases
+  return await adminDb.admin().listDatabases();
 }

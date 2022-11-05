@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.objectIdWithTimestamp = exports.getTempValue = exports.setTempValue = exports.getCollectionNames = exports.getAllCollectionNames = exports.dbCreateIndex = exports.connectDb = exports.insertManyIgnoreDup = void 0;
+exports.getAllDatabases = exports.objectIdWithTimestamp = exports.getTempValue = exports.setTempValue = exports.getCollectionNames = exports.getAllCollectionNames = exports.connectDb = exports.insertManyIgnoreDup = void 0;
 const mongodb = __importStar(require("mongodb"));
 function insertManyIgnoreDup(collection, data) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -74,12 +74,6 @@ function connectDb(mongoUrl, options = {}) {
     });
 }
 exports.connectDb = connectDb;
-function dbCreateIndex(collection, indexConfig, indexOptions) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield collection.createIndex(indexConfig, indexOptions);
-    });
-}
-exports.dbCreateIndex = dbCreateIndex;
 // getAllCollectionNames with views
 function getAllCollectionNames(db) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -124,3 +118,11 @@ function objectIdWithTimestamp(timestamp) {
     return constructedObjectId;
 }
 exports.objectIdWithTimestamp = objectIdWithTimestamp;
+function getAllDatabases(con) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const adminDb = con.db('admin');
+        // List all the available databases
+        return yield adminDb.admin().listDatabases();
+    });
+}
+exports.getAllDatabases = getAllDatabases;

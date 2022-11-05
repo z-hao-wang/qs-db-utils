@@ -1,6 +1,6 @@
 {
   "name": "qs-db-utils",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,12 +31,14 @@
   "peerDependencies": {
     "mongodb": "4.x"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "@ava/typescript": "^3.0.1",
     "@types/mongodb": "^4.0.7",
     "@types/node": "^18.11.9",
     "ava": "^5.0.1",
+    "dotenv": "^16.0.3",
     "mongodb": "^4.11.0",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
