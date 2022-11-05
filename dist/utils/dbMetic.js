@@ -14,11 +14,13 @@ const mongoUtils_1 = require("./mongoUtils");
 function isPromise(p) {
     return typeof p === 'object' && typeof p.then === 'function';
 }
-function getAllMongoSizes(dbUrl, onStat) {
+function getAllMongoSizes(con, onStat) {
     return __awaiter(this, void 0, void 0, function* () {
-        const con = yield (0, mongoUtils_1.connectDb)(dbUrl);
         const dbs = yield (0, mongoUtils_1.getAllDatabases)(con);
-        const dbSizes = dbs.databases.map(d => ({ name: d.name, size: d.sizeOnDisk ? Math.round(d.sizeOnDisk / 1000000).toLocaleString() : 0 }));
+        const dbSizes = dbs.databases.map((d) => ({
+            name: d.name,
+            size: d.sizeOnDisk ? Math.round(d.sizeOnDisk / 1000000).toLocaleString() : 0,
+        }));
         for (let dbInfo of dbSizes) {
             const { name } = dbInfo;
             if (['config', 'local', 'admin'].includes(name))

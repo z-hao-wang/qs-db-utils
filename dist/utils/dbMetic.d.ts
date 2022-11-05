@@ -1,5 +1,5 @@
-import { CollStats } from "mongodb";
-export declare function getAllMongoSizes(dbUrl: string, onStat: (options: {
+import { CollStats, MongoClient } from 'mongodb';
+export declare function getAllMongoSizes(con: MongoClient, onStat: (options: {
     dbName: string;
     collectionName: string;
     stats: CollStats;

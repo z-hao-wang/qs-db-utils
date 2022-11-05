@@ -32,8 +32,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllDatabases = exports.objectIdWithTimestamp = exports.getTempValue = exports.setTempValue = exports.getCollectionNames = exports.getAllCollectionNames = exports.connectDb = exports.insertManyIgnoreDup = void 0;
+exports.getAllDatabases = exports.objectIdWithTimestamp = exports.getTempValue = exports.setTempValue = exports.getCollectionNames = exports.getAllCollectionNames = exports.insertManyIgnoreDup = exports.connectDb = void 0;
 const mongodb = __importStar(require("mongodb"));
+function connectDb(mongoUrl, options = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!mongoUrl) {
+            throw Error('invalid mongoddb url');
+        }
+        return yield mongodb.MongoClient.connect(mongoUrl, options);
+    });
+}
+exports.connectDb = connectDb;
 function insertManyIgnoreDup(collection, data) {
     return __awaiter(this, void 0, void 0, function* () {
         if (data.length === 0) {
@@ -65,15 +74,6 @@ function insertManyIgnoreDup(collection, data) {
     });
 }
 exports.insertManyIgnoreDup = insertManyIgnoreDup;
-function connectDb(mongoUrl, options = {}) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!mongoUrl) {
-            throw Error('invalid mongoddb url');
-        }
-        return yield mongodb.MongoClient.connect(mongoUrl, options);
-    });
-}
-exports.connectDb = connectDb;
 // getAllCollectionNames with views
 function getAllCollectionNames(db) {
     return __awaiter(this, void 0, void 0, function* () {

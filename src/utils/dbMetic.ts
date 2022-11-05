@@ -1,15 +1,14 @@
-import { connectDb, getAllDatabases } from './mongoUtils';
-import { CollStats } from 'mongodb';
+import { getAllDatabases } from './mongoUtils';
+import { CollStats, MongoClient } from 'mongodb';
 
 function isPromise(p: any) {
   return typeof p === 'object' && typeof p.then === 'function';
 }
 
 export async function getAllMongoSizes(
-  dbUrl: string,
+  con: MongoClient,
   onStat: (options: { dbName: string; collectionName: string; stats: CollStats }) => any,
 ) {
-  const con = await connectDb(dbUrl);
   const dbs = await getAllDatabases(con);
   const dbSizes = dbs.databases.map((d) => ({
     name: d.name,

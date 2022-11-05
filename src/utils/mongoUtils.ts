@@ -1,5 +1,15 @@
 import * as mongodb from 'mongodb';
 
+export async function connectDb(
+  mongoUrl: string,
+  options: mongodb.MongoClientOptions = {},
+): Promise<mongodb.MongoClient> {
+  if (!mongoUrl) {
+    throw Error('invalid mongoddb url');
+  }
+  return await mongodb.MongoClient.connect(mongoUrl, options);
+}
+
 export async function insertManyIgnoreDup(collection: mongodb.Collection, data: any[]) {
   if (data.length === 0) {
     return { inserted: 0, skipped: 0 };
@@ -24,17 +34,6 @@ export async function insertManyIgnoreDup(collection: mongodb.Collection, data: 
     }
   }
   return { inserted: data.length - skipped, skipped };
-}
-
-export async function connectDb(
-  mongoUrl: string,
-  options: mongodb.MongoClientOptions = {},
-): Promise<mongodb.MongoClient> {
-  if (!mongoUrl) {
-    throw Error('invalid mongoddb url');
-  }
-
-  return await mongodb.MongoClient.connect(mongoUrl, options);
 }
 
 // getAllCollectionNames with views
