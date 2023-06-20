@@ -55,8 +55,7 @@ export async function setTempValue(db: mongodb.Db, key: string, doc: { [key: str
       key,
     },
     {
-      ...doc,
-      key,
+      $set: doc,
     },
     {
       upsert: true,

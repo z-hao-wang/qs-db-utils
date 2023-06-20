@@ -44,10 +44,7 @@ function rebuildCollectionData(db, collectionName) {
             console.log(`${db.databaseName} ${collectionName} inserted ${result.inserted} skipped ${result.skipped}`);
         });
         // expect tmp collection has 0 value
-        const count = yield db
-            .collection(tmpCollectionName)
-            .find({})
-            .count();
+        const count = yield db.collection(tmpCollectionName).find({}).count();
         if (count !== 0) {
             throw new Error(`move Batch failed, data length ${count} is not 0`);
         }

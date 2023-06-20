@@ -95,7 +95,9 @@ function setTempValue(db, key, doc) {
         // store a value to temp db
         return yield db.collection('temp').updateOne({
             key,
-        }, Object.assign(Object.assign({}, doc), { key }), {
+        }, {
+            $set: doc,
+        }, {
             upsert: true,
         });
     });
