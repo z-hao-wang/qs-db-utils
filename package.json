@@ -1,6 +1,6 @@
 {
   "name": "qs-db-utils",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
